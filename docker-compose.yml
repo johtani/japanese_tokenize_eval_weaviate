@@ -1,0 +1,39 @@
+---
+services:
+  jupyter:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    init: true
+    environment:
+      - TZ=Asia/Tokyo
+    command: sleep infinity
+    volumes:
+      - .:/workspace:cached
+      - venv-eval-ja-weaviate:/workspace/.venv
+
+  weaviate:
+    command:
+    - --host
+    - 0.0.0.0
+    - --port
+    - '8080'
+    - --scheme
+    - http
+    image: cr.weaviate.io/semitechnologies/weaviate:1.26.3
+    ports:
+    - 8080:8080
+    - 50051:50051
+    restart: on-failure:0
+    environment:
+      GOOGLE_APIKEY: $GOOGLE_APIKEY
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      ENABLE_MODULES: text2vec-palm
+      DEFAULT_VECTORIZER_MODULE: text2vec-palm
+      CLUSTER_HOSTNAME: 'node1'
+      ENABLE_TOKENIZER_GSE: true
+
+volumes:
+  venv-eval-ja-weaviate:
